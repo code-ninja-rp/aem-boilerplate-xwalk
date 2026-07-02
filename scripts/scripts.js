@@ -71,10 +71,46 @@ function buildAutoBlocks() {
 }
 
 /**
+ * Slugifies text for use as a compact, attribute-safe token.
+ * @param {string} text The text to slugify
+ * @returns {string} The slugified text, capped at 40 chars
+ */
+function slugify(text) {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 40);
+}
+
+/**
  * Decorates formatted links to style them as buttons.
  * @param {HTMLElement} main The main container element
  */
 export function decorateButtons(main) {
+  // Precompute, in a single pass, the 1-based page position of every EDS block
+  // instance (by data-block-name) and of every top-level section (used as the
+  // instance boundary for unstructured "content" placements). This avoids
+  // re-querying `main` for every individual button below.
+  const blockInstanceIndex = new Map();
+  const blockNameCounters = new Map();
+  main.querySelectorAll('[data-block-name]').forEach((block) => {
+    const name = block.dataset.blockName;
+    const count = (blockNameCounters.get(name) || 0) + 1;
+    blockNameCounters.set(name, count);
+    blockInstanceIndex.set(block, count);
+  });
+
+  const sectionInstanceIndex = new Map();
+  main.querySelectorAll('.section').forEach((section, i) => {
+    sectionInstanceIndex.set(section, i + 1);
+  });
+
+  const buttonIndexInInstance = new Map();
+
   main.querySelectorAll('p a[href]').forEach((a) => {
     a.title = a.title || a.textContent;
     const p = a.closest('p');
@@ -106,6 +142,22 @@ export function decorateButtons(main) {
       a.classList.add('secondary');
       em.replaceWith(a);
     }
+
+    // CSS classes (.button/.primary/.secondary/.accent) are style hooks that can
+    // change on redesign and carry no semantic/business meaning, so they're
+    // unsuitable as an analytics selector. data-cta is a stable, content-derived
+    // hook intended for the "Link Click" rule in Adobe Data Collection, scoped
+    // to `a[data-cta]`, and disambiguates repeated CTAs/blocks on the same page.
+    const blockEl = a.closest('[data-block-name]');
+    const blockName = blockEl ? blockEl.dataset.blockName : 'content';
+    const instanceEl = blockEl || a.closest('.section') || main;
+    const instanceIndex = blockEl
+      ? blockInstanceIndex.get(blockEl)
+      : (sectionInstanceIndex.get(instanceEl) || 1);
+    const buttonIndex = (buttonIndexInInstance.get(instanceEl) || 0) + 1;
+    buttonIndexInInstance.set(instanceEl, buttonIndex);
+
+    a.dataset.cta = `${slugify(text)}--${blockName}-${instanceIndex}-${buttonIndex}`;
   });
 }
 
