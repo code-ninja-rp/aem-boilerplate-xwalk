@@ -269,4 +269,17 @@ header nav .nav-sections ul > li > ul > li {
 /* tools */
 header nav .nav-tools {
   grid-area: tools;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+header nav .nav-tools .nav-login {
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+header nav .nav-tools .nav-login:hover {
+  color: var(--link-hover-color);
 }

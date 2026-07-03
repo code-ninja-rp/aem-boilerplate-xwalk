@@ -214,5 +214,31 @@
         "valueType": "string"
       }
     ]
+  },
+  {
+    "id": "login",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "heading",
+        "label": "Heading",
+        "value": "Sign In"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "buttonText",
+        "label": "Button Text",
+        "value": "Log In"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "successMessage",
+        "label": "Success Message",
+        "value": "You're logged in."
+      }
+    ]
   }
 ]

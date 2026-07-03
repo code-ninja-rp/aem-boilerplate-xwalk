@@ -151,6 +151,22 @@ export default async function decorate(block) {
     });
   }
 
+  // login trigger: ensure a tools section exists so it always has a place to
+  // render, even if the authored nav fragment doesn't include one. Links to
+  // the /login page rather than opening the form inline here, keeping the
+  // header decoration-only and the mock-login logic contained to the block.
+  let navTools = nav.querySelector('.nav-tools');
+  if (!navTools) {
+    navTools = document.createElement('div');
+    navTools.className = 'nav-tools';
+    nav.append(navTools);
+  }
+  const loginLink = document.createElement('a');
+  loginLink.className = 'nav-login';
+  loginLink.href = '/login';
+  loginLink.textContent = 'Log In';
+  navTools.append(loginLink);
+
   // hamburger for mobile
   const hamburger = document.createElement('div');
   hamburger.classList.add('nav-hamburger');

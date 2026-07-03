@@ -1,0 +1,34 @@
+.login .login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 320px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.login .login-form label {
+  font-weight: 600;
+}
+
+.login .login-form input {
+  padding: 8px 10px;
+  border: 1px solid var(--dark-color);
+  border-radius: 4px;
+  font: inherit;
+}
+
+.login .login-form button {
+  margin-top: 8px;
+}
+
+.login .login-status {
+  min-height: 1.2em;
+  color: var(--text-color);
+}
+
+@media (width >= 600px) {
+  .login .login-form {
+    padding: 32px;
+  }
+}
