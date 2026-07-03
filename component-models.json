@@ -231,13 +231,6 @@
         "name": "buttonText",
         "label": "Button Text",
         "value": "Log In"
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "successMessage",
-        "label": "Success Message",
-        "value": "You're logged in."
       }
     ]
   }

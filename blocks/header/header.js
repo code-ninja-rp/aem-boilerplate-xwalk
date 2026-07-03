@@ -54,6 +54,68 @@ function focusNavSection() {
 }
 
 /**
+ * Renders the login/logout control into the nav tools area, reading the
+ * mock logged-in state the login block persists to localStorage. Logged
+ * out: a "Log In" link to the login page. Logged in: the username behind a
+ * disclosure button with a "Log-out" option, mirroring the aria-expanded
+ * disclosure pattern used for nav-drop sections above.
+ * @param {Element} navTools The nav tools container element
+ */
+function renderLoginControl(navTools) {
+  navTools.querySelectorAll('.nav-login, .nav-user').forEach((el) => el.remove());
+
+  let username;
+  try {
+    username = localStorage.getItem('login-username');
+  } catch { /* storage unavailable, e.g. private browsing */ }
+
+  if (!username) {
+    const loginLink = document.createElement('a');
+    loginLink.className = 'nav-login';
+    loginLink.href = '/login';
+    loginLink.textContent = 'Log In';
+    navTools.append(loginLink);
+    return;
+  }
+
+  const userDrop = document.createElement('div');
+  userDrop.className = 'nav-user';
+
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'nav-user-toggle';
+  toggle.textContent = username;
+  toggle.setAttribute('aria-haspopup', 'true');
+  toggle.setAttribute('aria-expanded', 'false');
+  toggle.addEventListener('click', () => {
+    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+  });
+
+  const menu = document.createElement('ul');
+  menu.className = 'nav-user-menu';
+  const logoutItem = document.createElement('li');
+  const logoutButton = document.createElement('button');
+  logoutButton.type = 'button';
+  logoutButton.textContent = 'Log-out';
+  logoutButton.addEventListener('click', () => {
+    try {
+      localStorage.removeItem('login-username');
+    } catch { /* storage unavailable, e.g. private browsing */ }
+    renderLoginControl(navTools);
+  });
+  logoutItem.append(logoutButton);
+  menu.append(logoutItem);
+
+  userDrop.addEventListener('focusout', (e) => {
+    if (!userDrop.contains(e.relatedTarget)) toggle.setAttribute('aria-expanded', 'false');
+  });
+
+  userDrop.append(toggle, menu);
+  navTools.append(userDrop);
+}
+
+/**
  * Toggles all nav sections
  * @param {Element} sections The container element
  * @param {Boolean} expanded Whether the element should be expanded or collapsed
@@ -152,20 +214,14 @@ export default async function decorate(block) {
   }
 
   // login trigger: ensure a tools section exists so it always has a place to
-  // render, even if the authored nav fragment doesn't include one. Links to
-  // the /login page rather than opening the form inline here, keeping the
-  // header decoration-only and the mock-login logic contained to the block.
+  // render, even if the authored nav fragment doesn't include one.
   let navTools = nav.querySelector('.nav-tools');
   if (!navTools) {
     navTools = document.createElement('div');
     navTools.className = 'nav-tools';
     nav.append(navTools);
   }
-  const loginLink = document.createElement('a');
-  loginLink.className = 'nav-login';
-  loginLink.href = '/login';
-  loginLink.textContent = 'Log In';
-  navTools.append(loginLink);
+  renderLoginControl(navTools);
 
   // hamburger for mobile
   const hamburger = document.createElement('div');

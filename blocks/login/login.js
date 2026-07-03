@@ -7,10 +7,9 @@ import { moveInstrumentation } from '../../scripts/scripts.js';
  * @param {Element} block The login block element
  */
 export default function decorate(block) {
-  const [headingRow, buttonRow, successRow] = block.children;
+  const [headingRow, buttonRow] = block.children;
   const heading = headingRow?.textContent.trim() || 'Sign In';
   const buttonText = buttonRow?.textContent.trim() || 'Log In';
-  const successMessage = successRow?.textContent.trim() || "You're logged in.";
 
   const form = document.createElement('form');
   form.className = 'login-form';
@@ -44,11 +43,6 @@ export default function decorate(block) {
   submit.textContent = buttonText;
   if (buttonRow) moveInstrumentation(buttonRow, submit);
 
-  const status = document.createElement('p');
-  status.className = 'login-status';
-  status.setAttribute('role', 'status');
-  status.setAttribute('aria-live', 'polite');
-
   form.append(
     title,
     usernameLabel,
@@ -56,27 +50,33 @@ export default function decorate(block) {
     passwordLabel,
     passwordInput,
     submit,
-    status,
   );
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
-    if (!usernameInput.value.trim()) return;
+    const username = usernameInput.value.trim();
+    if (!username) return;
 
-    // Mock login only — the username/password values are never read beyond
-    // this check, and nothing is validated, stored, or sent anywhere. This
-    // pushes a structured event to the Adobe Client Data Layer so the AEP
-    // Web SDK / Data Collection (Launch) property can react to it via an
-    // "Adobe Client Data Layer" rule listening for event === 'login',
-    // without needing real authentication wired up yet.
+    // Mock login only — the password value is never read at all, and the
+    // username is never validated against anything; it's only kept to
+    // mimic a logged-in session in the header. This pushes a structured
+    // event to the Adobe Client Data Layer so the AEP Web SDK / Data
+    // Collection (Launch) property can react to it via an "Adobe Client
+    // Data Layer" rule listening for event === 'login', without needing
+    // real authentication wired up yet.
     window.adobeDataLayer = window.adobeDataLayer || [];
     window.adobeDataLayer.push({
       event: 'login',
       login: { method: 'mock', status: 'success' },
     });
 
-    status.textContent = successMessage;
-    form.reset();
+    // Persist only the display name locally so the header can reflect a
+    // logged-in state across pages. Still no credential storage.
+    try {
+      localStorage.setItem('login-username', username);
+    } catch { /* storage unavailable, e.g. private browsing */ }
+
+    window.location.href = '/';
   });
 
   block.replaceChildren(form);

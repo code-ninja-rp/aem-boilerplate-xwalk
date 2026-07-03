@@ -283,3 +283,60 @@ header nav .nav-tools .nav-login {
 header nav .nav-tools .nav-login:hover {
   color: var(--link-hover-color);
 }
+
+/* user menu */
+header nav .nav-tools .nav-user {
+  position: relative;
+}
+
+header nav .nav-tools .nav-user-toggle {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background-color: transparent;
+  font: inherit;
+  font-weight: 500;
+  color: currentcolor;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+header nav .nav-tools .nav-user-toggle:hover {
+  color: var(--link-hover-color);
+}
+
+header nav .nav-tools .nav-user-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 3;
+  margin: 8px 0 0;
+  padding: 8px 0;
+  min-width: 140px;
+  list-style: none;
+  background-color: var(--background-color);
+  border: 1px solid var(--light-color);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
+}
+
+header nav .nav-tools .nav-user-toggle[aria-expanded='true'] + .nav-user-menu {
+  display: block;
+}
+
+header nav .nav-tools .nav-user-menu li button {
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  padding: 8px 16px;
+  background-color: transparent;
+  font: inherit;
+  text-align: left;
+  color: currentcolor;
+  cursor: pointer;
+}
+
+header nav .nav-tools .nav-user-menu li button:hover {
+  background-color: var(--light-color);
+}
